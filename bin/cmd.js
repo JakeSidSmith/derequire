@@ -15,6 +15,11 @@ var argv = require('yargs')
       default : 'require',
       describe: 'token to find and change'
   })
+  .options('u', {
+      alias : 'exclude',
+      default : '',
+      describe: 'module(s) to exclude from transform'
+  })
   .help('h')
   .alias('h', 'help')
   .version(require('../package.json').version, 'v')
