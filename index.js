@@ -11,7 +11,14 @@ function write(arr, str, offset) {
   }
 }
 
-function rename(code, tokenTo, tokenFrom) {
+function rename(code, tokenTo, tokenFrom, exclude) {
+
+  // Ensure our exclusions are an array
+  var excluded = [].concat(exclude)
+    .filter(function(ex) {
+      // Remove any empty / non-string values
+      return ex && typeof ex === 'string';
+    });
 
   var tokens;
   if (!Array.isArray(tokenTo)) {
