@@ -4,11 +4,40 @@ var acorn = require('acorn');
 var escope = require('escope');
 
 var requireRegexp = /\brequire\b/;
+var pathToRequiredModuleName = [
+  'references',
+  0,
+  'from',
+  'block',
+  'body',
+  'body',
+  0,
+  'declarations',
+  0,
+  'init',
+  'arguments',
+  0,
+  'value'
+];
 
 function write(arr, str, offset) {
   for (var i = 0, l = str.length; i < l; i++) {
     arr[offset + i] = str[i];
   }
+}
+
+function getIn(obj, path) {
+  if (!obj) {
+    return null;
+  }
+
+  if (path.length === 1) {
+    return obj[path[0]];
+  }
+
+  var key = path.shift();
+
+  return getIn(obj[key], path);
 }
 
 function rename(code, tokenTo, tokenFrom, exclude) {
@@ -76,6 +105,15 @@ function rename(code, tokenTo, tokenFrom, exclude) {
         var token = tokens[k];
 
         if (variable.name !== token.from) {
+          continue;
+        }
+
+        var requiredModuleName = getIn(
+          variable,
+          pathToRequiredModuleName
+        );
+
+        if (excluded.indexOf(requiredModuleName) >= 0) {
           continue;
         }
 
