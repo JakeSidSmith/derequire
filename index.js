@@ -108,10 +108,7 @@ function rename(code, tokenTo, tokenFrom, exclude) {
           continue;
         }
 
-        var requiredModuleName = getIn(
-          variable,
-          pathToRequiredModuleName
-        );
+        var requiredModuleName = getIn(variable, pathToRequiredModuleName);
 
         if (excluded.indexOf(requiredModuleName) >= 0) {
           continue;
