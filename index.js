@@ -70,20 +70,20 @@ function rename(code, tokenTo, tokenFrom, exclude) {
           walk(value);
         }
       } else {
-        for (var key in obj) {
-          var value = obj[key];
+        if (obj.type === 'Identifier') {
+          var value = obj.name;
 
-          if (obj.type === 'Identifier') {
-            for (var i = 0; i < tokens.length; i += 1) {
-              var token = tokens[i];
+          for (var i = 0; i < tokens.length; i += 1) {
+            var token = tokens[i];
 
-              if (value === token.from) {
-                write(code, token.to, obj.range[0]);
-              }
+            if (value === token.from) {
+              write(code, token.to, obj.range[0]);
             }
           }
+        }
 
-          walk(value);
+        for (var key in obj) {
+          walk(obj[key]);
         }
       }
     }
