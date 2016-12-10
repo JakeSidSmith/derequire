@@ -4,40 +4,11 @@ var acorn = require('acorn');
 var escope = require('escope');
 
 var requireRegexp = /\brequire\b/;
-var pathToRequiredModuleName = [
-  'references',
-  0,
-  'from',
-  'block',
-  'body',
-  'body',
-  0,
-  'declarations',
-  0,
-  'init',
-  'arguments',
-  0,
-  'value'
-];
 
 function write(arr, str, offset) {
   for (var i = 0, l = str.length; i < l; i++) {
     arr[offset + i] = str[i];
   }
-}
-
-function getIn(obj, path) {
-  if (!obj) {
-    return null;
-  }
-
-  if (path.length === 1) {
-    return obj[path[0]];
-  }
-
-  var key = path.shift();
-
-  return getIn(obj[key], path);
 }
 
 function rename(code, tokenTo, tokenFrom, exclude) {
@@ -84,49 +55,41 @@ function rename(code, tokenTo, tokenFrom, exclude) {
     return code;
   }
 
-  //
-  // heavily inspired by https://github.com/estools/esshorten
-  //
-
   code = String(code).split('');
 
-  var manager = escope.analyze(ast, {optimistic: true, ecmaVersion: 6});
+  function walk(obj) {
+    if (!obj) {
+      return;
+    }
 
-  for (var i = 0, iz = manager.scopes.length; i < iz; i++) {
-    var scope = manager.scopes[i];
+    if (typeof obj === 'object') {
+      if (Array.isArray(obj)) {
+        for (var i = 0; i < obj.length; i += 1) {
+          var value = obj[i];
 
-    for (var j = 0, jz = scope.variables.length; j < jz; j++) {
-      var variable = scope.variables[j];
-
-      if (variable.tainted || variable.identifiers.length === 0) {
-        continue;
-      }
-
-      for (var k = 0, kz = tokens.length; k < kz; k++) {
-        var token = tokens[k];
-
-        if (variable.name !== token.from) {
-          continue;
+          walk(value);
         }
+      } else {
+        for (var key in obj) {
+          var value = obj[key];
 
-        var requiredModuleName = getIn(variable, pathToRequiredModuleName);
+          if (obj.type === 'Identifier') {
+            for (var i = 0; i < tokens.length; i += 1) {
+              var token = tokens[i];
 
-        if (excluded.indexOf(requiredModuleName) >= 0) {
-          continue;
-        }
+              if (value === token.from) {
+                write(code, token.to, obj.range[0]);
+              }
+            }
+          }
 
-        for (var l = 0, lz = variable.identifiers.length; l < lz; l++) {
-          var def = variable.identifiers[l];
-          write(code, token.to, def.range[0]);
-        }
-
-        for (var m = 0, mz = variable.references.length; m < mz; m++) {
-          var ref = variable.references[m];
-          write(code, token.to, ref.identifier.range[0]);
+          walk(value);
         }
       }
     }
   }
+
+  walk(ast);
 
   return code.join('');
 }
