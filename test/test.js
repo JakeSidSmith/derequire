@@ -177,6 +177,25 @@ describe('derequire', function(){
       });
     });
   });
+
+  it('should allow excluding modules', function() {
+    var source = (
+      'var x=function(require,module,exports){' +
+        'var process=require("__browserify_process");' +
+        'var React=require("react");' +
+        'var requireText = "require";' +
+      '}'
+    );
+    var expected = (
+      'var x=function(_dereq_,module,exports){' +
+        'var process=_dereq_("__browserify_process");' +
+        'var React=require("react");' +
+        'var requireText = "require";' +
+      '}'
+    );
+    assert.equal(derequire(source, undefined, undefined, 'react'), expected);
+  });
+
 });
 
 describe('browserify plugin', function() {
