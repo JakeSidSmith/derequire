@@ -79,6 +79,7 @@ function rename(code, tokenTo, tokenFrom, exclude) {
       allowReturnOutsideFunction: true
     });
   } catch(err) {
+    console.error('Derequire failed.');
     // this should probably log something and/or exit violently
     return code;
   }
