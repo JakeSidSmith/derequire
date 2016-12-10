@@ -17,13 +17,15 @@ describe('derequire', function(){
       'var x=function(require,module,exports){' +
         'var process=require("__browserify_process");' +
         'var requireText = "require";' +
-      '}'
+      '};' +
+      'var thing = typeof require !== "undefined" && require;'
     );
     var expected = (
       'var x=function(_dereq_,module,exports){' +
         'var process=_dereq_("__browserify_process");' +
         'var requireText = "require";' +
-      '}'
+      '};' +
+      'var thing = typeof _dereq_ !== "undefined" && _dereq_;'
     );
     assert.equal(derequire(source), expected);
   });
