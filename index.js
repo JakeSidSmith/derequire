@@ -70,7 +70,23 @@ function rename(code, tokenTo, tokenFrom, exclude) {
           walk(value);
         }
       } else {
-        if (obj.type === 'Identifier') {
+        if (obj.type === 'CallExpression') {
+          var name = obj.callee.name;
+
+          for (var i = 0; i < tokens.length; i += 1) {
+            var token = tokens[i];
+
+            if (
+              name === token.from &&
+              obj.arguments.length === 1 &&
+              obj.arguments[0].type === 'Literal' &&
+              obj.arguments[0].value &&
+              excluded.indexOf(obj.arguments[0].value) >= 0
+            ) {
+              obj.arguments[0].excluded = true;
+            }
+          }
+        } else if (obj.type === 'Identifier' && !obj.excluded) {
           var value = obj.name;
 
           for (var i = 0; i < tokens.length; i += 1) {
