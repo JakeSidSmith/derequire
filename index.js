@@ -83,7 +83,7 @@ function rename(code, tokenTo, tokenFrom, exclude) {
               obj.arguments[0].value &&
               excluded.indexOf(obj.arguments[0].value) >= 0
             ) {
-              obj.arguments[0].excluded = true;
+              obj.callee.excluded = true;
             }
           }
         } else if (obj.type === 'Identifier' && !obj.excluded) {
