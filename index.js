@@ -93,7 +93,7 @@ function rename(code, tokenTo, tokenFrom, exclude) {
             var token = tokens[i];
 
             if (value === token.from) {
-              write(code, token.to, obj.range[0]);
+              write(code, token.to, obj.start);
             }
           }
         }
